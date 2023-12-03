@@ -3,11 +3,11 @@ from logging import handlers
 import os
 
 # if you want super verbose logging
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger('discord')
-logger.setLevel(logging.DEBUG)
-logging.getLogger('discord.http').setLevel(logging.INFO)
+# logger.setLevel(logging.DEBUG)
+# logging.getLogger('discord.http').setLevel(logging.INFO)
 
 dt_fmt = '%Y-%m-%d %H:%M:%S'
 formatter = logging.Formatter(

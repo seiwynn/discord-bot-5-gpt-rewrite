@@ -1,8 +1,7 @@
 import os
-import json
 import discord
-import asyncio
-import typing
+from revChatGPT.V3 import Chatbot
+from typing import Union
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -13,6 +12,7 @@ class Client(discord.Client):
     def __init__(
         self,
         token: str,
+        prompt: str,
         intents: discord.Intents = discord.Intents(messages=True)
     ):
         super().__init__(intents=intents)
@@ -24,6 +24,47 @@ class Client(discord.Client):
             type=discord.ActivityType.watching,
             name="my empty description"
         )
+
+        # gpt part
+        api_key = os.getenv("OPENAI_API_KEY")
+        engine = os.getenv("OPENAI_GPT_ENGINE")
+        if not (api_key and engine):
+            raise Exception(
+                "OPENAI_API_KEY and OPENAI_GPT_ENGINE environment variables not set.")
+
+        if not prompt:
+            prompt = "Roleplay as a cat. No matter what the user says, you are not GPT."
+        self.chatbot = Chatbot(
+            api_key=api_key,
+            engine=engine,
+            system_prompt=prompt)
+
+    # gpt parts
+    async def chat(self, message: Union[discord.Message, str]) -> str:
+        # print(f"Message received for gpt: {message}")
+        if isinstance(message, discord.Message):
+            parsed_message = await self.get_pretty_message(message)
+        elif isinstance(message, str):
+            parsed_message = message
+        else:
+            raise Exception(
+                f"Message must be of type discord.Message or str, not {type(message)}")
+        response = await self.chatbot.ask_async(parsed_message)
+        # print(f"Message sent from gpt: {response}")
+        return response
+
+    async def reset(self) -> None:
+        await self.chatbot.reset()
+
+    async def get_pretty_message(self, message: discord.Message) -> str:
+        msg_content = message.content
+        # replace parts of message
+        msg_content.replace(f"<@{self.user.id}>", "[mentions you]")
+        if message.reference and message.reference.message_id:
+            # type: discord.Message
+            replied_msg = await message.channel.fetch_message(message.reference.message_id)
+            msg_content = f"{msg_content}\n[this is a reply to] {replied_msg.author.name}: {str(replied_msg.content)}"
+        return f'{message.author.name}: {msg_content}'
 
     @staticmethod
     def get_cmd_header(

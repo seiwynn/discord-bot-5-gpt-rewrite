@@ -4,17 +4,13 @@ from discord import app_commands
 
 from src.client import Client
 
-# samples for ui stuff
-from src.ui.modal import ModalSample
-from src.ui.button import modal_button
-
 from utils.logger import logger
 from utils.fileio import read
 from utils.message import send
 
 
-def get_cli_with_cogs(token: str) -> discord.Client:
-    client = Client(token=token)
+def get_cli_with_cogs(token: str, prompt: str = "") -> discord.Client:
+    client = Client(token=token, prompt=prompt)
 
     @client.event
     async def on_ready():
@@ -31,9 +27,8 @@ def get_cli_with_cogs(token: str) -> discord.Client:
 
     @client.event
     async def on_message(message: discord.Message):
-        # skip slash commands and self (and other bots)
-        if message.type is discord.MessageType.chat_input_command:
-            return
+        # skip self (and other bots)
+        # apparently you don't need to skip slash commands
         if (message.author == client.user) or message.author.bot:  # must use ==, not 'is'
             return
 
@@ -43,6 +38,17 @@ def get_cli_with_cogs(token: str) -> discord.Client:
         if message.reference:
             # type: discord.Message
             msg_replied = await message.channel.fetch_message(message.reference.message_id)
+
+        # only handle dms and mentions
+        if not (is_dm or is_mentioned):
+            return
+
+        # if there's a kafka message queue in the future, this is where it would go
+        gpt_reply = await client.chat(message)
+        if is_dm:
+            await send(gpt_reply, message.channel.send)
+        elif is_mentioned:
+            await send(gpt_reply, message.reply)
 
     @client.tree.command(
         name="help",
@@ -57,51 +63,18 @@ def get_cli_with_cogs(token: str) -> discord.Client:
         await send(help_message, callback=interaction.followup.send)
 
     @client.tree.command(
-        name="modal",
-        description="modal sample"
+        name="whisper",
+        description="if you want to talk to me secretly, you can!"
     )
-    async def modal(interaction: discord.Interaction):
-        await interaction.response.send_modal(ModalSample())
-
-    @client.tree.command(
-        name="button",
-        description="button sample"
-    )
-    async def button(interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=False)
-        await interaction.followup.send(
-            "Click the button below!",
-            view=await modal_button()
-        )
-
-    # stolen from https://github.com/Rapptz/discord.py/blob/master/examples/app_commands/basic.py
-    @client.tree.command(
-        name="echo",
-        description="reiterate"
-    )
-    @app_commands.rename(echo_text="content")
-    @app_commands.describe(echo_text="I'll repeat this!")
-    @app_commands.choices(whisper=[
-        app_commands.Choice(name="on", value="on"),
-        app_commands.Choice(name="off", value="off")
-    ])
-    async def echo(interaction: discord.Interaction, *, echo_text: str, whisper: str = "off"):
-
+    async def whisper(interaction: discord.Interaction, *, content: str):
         # ephemeral=True means hidden reply
-        ep_flag = False
-        # Additional logic based on the 'whisper' value
-        if whisper == "on":
-            # Handle the whisper "on" case
-            ep_flag = True
+        await interaction.response.defer(ephemeral=True)
 
-        await interaction.response.defer(ephemeral=ep_flag)
-        await interaction.followup.send(
-            client.get_cmd_header(
-                id=interaction.user.id,
-                title="Echo"
-            ) +
-            f"Echoing: \n{echo_text}",
-            ephemeral=ep_flag
-        )
+        reply = await client.chat(content)
+        reply = client.get_cmd_header(
+            id=interaction.user.id,
+            title=content
+        ) + reply
+        await send(reply, callback=interaction.followup.send)
 
     return client

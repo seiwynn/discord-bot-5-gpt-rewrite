@@ -16,5 +16,5 @@ if __name__ == '__main__':
 
     if token:
         # run the actual bot
-        client = bot.get_cli_with_cogs(token)
+        client = bot.get_cli_with_cogs(token=token)
         client.run(client.token)
