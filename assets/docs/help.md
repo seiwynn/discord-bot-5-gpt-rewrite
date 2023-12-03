@@ -1,5 +1,7 @@
-# Hitomi's Bot template
-You might want a description here.
+# A Chatbot
+Guess what? I talk!
+DM or mention me to talk with me!
 
 :star: **BASIC COMMANDS** 
 - `/help` *summons this message*.
+- `/whisper` talk with me - in secret!
