@@ -44,11 +44,12 @@ def get_cli_with_cogs(token: str, prompt: str = "") -> discord.Client:
             return
 
         # if there's a kafka message queue in the future, this is where it would go
-        gpt_reply = await client.chat(message)
-        if is_dm:
-            await send(gpt_reply, message.channel.send)
-        elif is_mentioned:
-            await send(gpt_reply, message.reply)
+        async with message.channel.typing():
+            gpt_reply = await client.chat(message)
+            if is_dm:
+                await send(gpt_reply, message.channel.send)
+            elif is_mentioned:
+                await send(gpt_reply, message.reply)
 
     @client.tree.command(
         name="help",
@@ -61,6 +62,13 @@ def get_cli_with_cogs(token: str, prompt: str = "") -> discord.Client:
         # ephemeral=True means hidden reply
         await interaction.response.defer(ephemeral=False)
         await send(help_message, callback=interaction.followup.send)
+
+    @client.tree.command(
+        name="reset",
+        description="reset chat"
+    )
+    async def reset(interaction: discord.Interaction):
+        client.chatbot.reset()
 
     @client.tree.command(
         name="whisper",

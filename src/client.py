@@ -39,7 +39,7 @@ class Client(discord.Client):
             engine=engine,
             system_prompt=prompt)
 
-    # gpt parts
+    # gpt stuff
     async def chat(self, message: Union[discord.Message, str]) -> str:
         # print(f"Message received for gpt: {message}")
         if isinstance(message, discord.Message):
@@ -52,9 +52,6 @@ class Client(discord.Client):
         response = await self.chatbot.ask_async(parsed_message)
         # print(f"Message sent from gpt: {response}")
         return response
-
-    async def reset(self) -> None:
-        await self.chatbot.reset()
 
     async def get_pretty_message(self, message: discord.Message) -> str:
         msg_content = message.content
