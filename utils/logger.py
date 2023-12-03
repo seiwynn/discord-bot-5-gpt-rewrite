@@ -6,6 +6,7 @@ import os
 # logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger('discord')
+logger.setLevel(logging.INFO)
 # logger.setLevel(logging.DEBUG)
 # logging.getLogger('discord.http').setLevel(logging.INFO)
 

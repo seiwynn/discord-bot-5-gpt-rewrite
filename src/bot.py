@@ -10,6 +10,7 @@ from utils.message import send
 
 
 def get_cli_with_cogs(token: str, prompt: str = "") -> discord.Client:
+
     client = Client(token=token, prompt=prompt)
 
     @client.event
@@ -43,6 +44,13 @@ def get_cli_with_cogs(token: str, prompt: str = "") -> discord.Client:
         if not (is_dm or is_mentioned):
             return
 
+        client.log_interaction(
+            called_method="on_message",
+            content=message.content,
+            user=message.author,
+            channel=message.channel
+        )
+
         # if there's a kafka message queue in the future, this is where it would go
         async with message.channel.typing():
             gpt_reply = await client.chat(message)
@@ -69,6 +77,8 @@ def get_cli_with_cogs(token: str, prompt: str = "") -> discord.Client:
     )
     async def reset(interaction: discord.Interaction):
         client.chatbot.reset()
+        logger.info(
+            f"chat reset from slash command in channel {interaction.channel_id}")
 
     @client.tree.command(
         name="whisper",
@@ -77,6 +87,13 @@ def get_cli_with_cogs(token: str, prompt: str = "") -> discord.Client:
     async def whisper(interaction: discord.Interaction, *, content: str):
         # ephemeral=True means hidden reply
         await interaction.response.defer(ephemeral=True)
+
+        client.log_interaction(
+            called_method="/whisper",
+            content=content,
+            user=interaction.user,
+            channel=interaction.channel
+        )
 
         reply = await client.chat(content)
         reply = client.get_cmd_header(
