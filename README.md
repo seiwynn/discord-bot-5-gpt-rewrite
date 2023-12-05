@@ -1,10 +1,7 @@
-# discord-bot-2-template
-A template for my future bots.
-Formerly [a status bot](https://github.com/seiwynn/discord-bot-4-shiro) - you'll notice older commits referring to that.
+# discord-bot-5-gpt
+My implementation of a discord bot that allows you to talk to GPT (using an OPEN AI key)
 
-### Newly added features
-
-- 11/13/2023: message splitter for 2000 char limit
+\[README IN PROGRESS\]
 
 ### How to use
 
@@ -31,8 +28,6 @@ Formerly [a status bot](https://github.com/seiwynn/discord-bot-4-shiro) - you'll
     ```
 
 ### TODOs
-- ~~actual logger~~
-- ~~message splitter for 2000 char limit~~
 - message queue for slowmode/awaits
   - 3rd party api requests / scraping / file io
 
