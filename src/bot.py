@@ -79,6 +79,7 @@ def get_cli_with_cogs(token: str, prompt: str = "") -> discord.Client:
         client.chatbot.reset()
         logger.info(
             f"chat reset from slash command in channel {interaction.channel_id}")
+        await send("GPT has been reset!", callback=interaction.followup.send)
 
     @client.tree.command(
         name="whisper",

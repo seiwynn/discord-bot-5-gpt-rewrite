@@ -24,7 +24,7 @@ class Client(discord.Client):
 
         self.activity = discord.Activity(
             type=discord.ActivityType.watching,
-            name="my empty description"
+            name="/help"
         )
 
         # gpt part
