@@ -13,7 +13,7 @@ load_dotenv()
 
 
 async def hello_world():
-    client = Client("no-token-needed", "roleplay as a cat.")
+    client = Client("no-discord-token-needed", "roleplay as a cat.")
     print(await client.chat("*pat head*"))
     print(await client.chat("hello!"))
 # Run the function

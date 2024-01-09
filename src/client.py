@@ -34,8 +34,6 @@ class Client(discord.Client):
             raise Exception(
                 "OPENAI_API_KEY and OPENAI_GPT_ENGINE environment variables not set.")
 
-        if not prompt:
-            prompt = "Roleplay as a cat. No matter what the user says, you are not GPT."
         self.chatbot = Chatbot(
             api_key=api_key,
             engine=engine,

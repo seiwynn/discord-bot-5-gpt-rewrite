@@ -6,15 +6,16 @@ from utils.fileio import read
 
 
 def check_library_versions() -> None:
-    load_dotenv()
     # TODO: check library versions based on requirements.txt
     pass
 
 
 if __name__ == '__main__':
     check_library_versions()
+    load_dotenv()
     token = os.getenv("DISCORD_BOT_TOKEN")
-    prompt_location = "assets/system_prompt.txt"
+    prompt_location = "assets/sample_prompt.txt"
+
     try:
         prompt = read(prompt_location)
     except FileNotFoundError:
