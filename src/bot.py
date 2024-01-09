@@ -60,7 +60,7 @@ def get_cli_with_cogs(token: str, prompt: str = "") -> discord.Client:
                 await send(gpt_reply, message.reply)
 
     @client.tree.command(
-        name="help",
+        name="manual",
         description="use guide"
     )
     async def help(interaction: discord.Interaction):
